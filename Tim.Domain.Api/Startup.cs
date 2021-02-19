@@ -44,6 +44,14 @@ namespace Tim.Domain.Api
             services.AddTransient<ProdutoHandler, ProdutoHandler>();
 
 
+            services.AddTransient<ILoteRepository, LoteRepository>();
+            services.AddTransient<LoteHandler, LoteHandler>();
+
+
+            
+
+
+
             services.Configure<FormOptions>(o =>
             {
                 o.ValueLengthLimit = int.MaxValue;

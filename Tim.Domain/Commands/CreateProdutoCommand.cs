@@ -1,5 +1,6 @@
 using System;
 using Tim.Domain.Commands.Contracts;
+using Tim.Domain.Entities;
 using Tim.Domain.Util;
 
 namespace Tim.Domain.Commands
@@ -10,13 +11,14 @@ namespace Tim.Domain.Commands
         {
         }
 
-        public CreateProdutoCommand(int idLote, string descricao, DateTime dataEntrega, int quantidade, decimal valorUnitario)
+        public CreateProdutoCommand(int idLote, string descricao, DateTime dataEntrega, int quantidade, decimal valorUnitario, Lote lote)
         {
             Descricao = descricao;
             DataEntrega = dataEntrega;
             Quantidade = quantidade;
             ValorUnitario = valorUnitario;
             IdLote = idLote;
+            Lote = lote;
         }
 
         public string? Descricao { get; set; }
@@ -24,6 +26,8 @@ namespace Tim.Domain.Commands
         public int? Quantidade { get; set; }
         public decimal? ValorUnitario { get; set; }
         public int IdLote { get; set; }
+        public Lote Lote { get; set; }
+
 
 
         public void Validate()

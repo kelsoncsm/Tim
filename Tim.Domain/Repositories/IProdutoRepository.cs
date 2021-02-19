@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Tim.Domain.DTOs;
 using Tim.Domain.Entities;
 
 namespace Tim.Domain.Repositories
@@ -10,7 +11,7 @@ namespace Tim.Domain.Repositories
     void Create(Produto produto);
 
     Produto GetById(int id);
-    IEnumerable<Produto> GetAll();
+    IEnumerable<RetornoLoteDto> GetAll();
 
   }
 }

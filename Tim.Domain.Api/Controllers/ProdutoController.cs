@@ -9,6 +9,7 @@ using System.IO;
 using System.Threading.Tasks;
 using Tim.Domain.Api.Util;
 using Tim.Domain.Commands;
+using Tim.Domain.DTOs;
 using Tim.Domain.Entities;
 using Tim.Domain.Handlers;
 using Tim.Domain.Repositories;
@@ -26,7 +27,7 @@ namespace Tim.Domain.Api.Controllers
 
         [Route("Upload")]
         [HttpPost]
-        public async Task<IActionResult> UploadDoc([FromForm(Name = "files")] IList<IFormFile> files, [FromServices] ProdutoHandler handler)
+        public async Task<IActionResult> UploadDoc([FromForm(Name = "files")] IList<IFormFile> files, [FromServices] ProdutoHandler produtohandler, [FromServices] LoteHandler loteHandler)
         {
 
 
@@ -38,6 +39,8 @@ namespace Tim.Domain.Api.Controllers
             string erros = string.Empty;
             List<string> listaerros = new List<string>();
             int numLinhaErro = 0;
+            int qtdItens = 0;
+            decimal valorToral = 0;
             var filePath = string.Empty;
 
             foreach (var formFile in files)
@@ -52,13 +55,10 @@ namespace Tim.Domain.Api.Controllers
                     }
                 }
             }
-            //Path.Combine(Directory.GetCurrentDirectory(), @"Temp")
 
             try
             {
                 string _StringConexao = String.Format(@"Provider=Microsoft.ACE.OLEDB.12.0;Data Source={0};Extended Properties='Excel 12.0 Xml;HDR=YES;ReadOnly=False';", filePath);
-
-
                 _olecon = new OleDbConnection(_StringConexao);
                 _olecon.Open();
 
@@ -74,6 +74,7 @@ namespace Tim.Domain.Api.Controllers
                 List<CreateProdutoCommand> listaInsert = new List<CreateProdutoCommand>();
 
                 CreateProdutoCommand command = new CreateProdutoCommand();
+                CreateLoteCommand commandLote = new CreateLoteCommand();
                 while (reader.Read())
                 {
                     numLinhaErro++;
@@ -114,6 +115,10 @@ namespace Tim.Domain.Api.Controllers
                         erros += string.Format("Linha numero {0} - O campo quantidade tem que ser maior do que zero", numLinhaErro);
 
                     }
+                    else
+                    {
+                        qtdItens += command.Quantidade.Value;
+                    }
 
                     if (command.ValorUnitario == null)
                     {
@@ -127,6 +132,7 @@ namespace Tim.Domain.Api.Controllers
                     else
                     {
                         command.ValorUnitario = Math.Round(command.ValorUnitario.Value, 2);
+                        valorToral += (command.ValorUnitario.Value * command.Quantidade.Value);
                     }
 
                     #endregion
@@ -154,9 +160,14 @@ namespace Tim.Domain.Api.Controllers
                 }
                 else
                 {
+
+
+                    var retorno = (GenericCommandResult)loteHandler.Handle(new CreateLoteCommand() { DataLote = DateTime.Now, QuantidadeItens = qtdItens, ValorTotal = valorToral });
+
                     foreach (var item in listaInsert)
                     {
-                        handler.Handle(item);
+                        item.IdLote = (int)retorno.Data;
+                        produtohandler.Handle(item);
                     }
 
                 }
@@ -200,7 +211,7 @@ namespace Tim.Domain.Api.Controllers
 
         [Route("")]
         [HttpGet()]
-        public IEnumerable<Produto> GetAll([FromServices] IProdutoRepository repository)
+        public IEnumerable<RetornoLoteDto> GetAll([FromServices] IProdutoRepository repository)
         {
 
             return repository.GetAll();

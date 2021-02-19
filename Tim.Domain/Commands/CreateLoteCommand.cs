@@ -18,15 +18,15 @@ namespace Tim.Domain.Commands
         }
 
 
-        public DateTime DataLote { get; private set; }
-        public int QuantidadeItens { get; private set; }
-        public decimal ValorTotal { get; private set; }
+        public DateTime DataLote { get;  set; }
+        public int QuantidadeItens { get;  set; }
+        public decimal ValorTotal { get;  set; }
 
 
 
         public void Validate()
         {
-           
+
         }
     }
 }
