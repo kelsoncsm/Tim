@@ -8,7 +8,7 @@ namespace Tim.Domain.Infra.Maps
   {
     public void Configure(EntityTypeBuilder<Produto> builder)
     {
-      builder.ToTable("Produto");
+      builder.ToTable("produto");
       builder.HasKey(c => c.Id);
       builder.Property(c => c.Id).ValueGeneratedOnAdd();
      

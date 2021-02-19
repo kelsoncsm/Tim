@@ -23,8 +23,8 @@ namespace Tim.Domain.Handlers
         return new GenericCommandResult(false, "Ocorreu um erro!", command.Notifications);
 
       // Gera o Livro
-      Produto produto = new Produto(command.Descricao, command.DataEntrega,
-                              command.Quantidade, command.ValorUnitario);
+      Produto produto = new Produto(command.Descricao, command.DataEntrega.Value,
+                              command.Quantidade.Value, command.ValorUnitario.Value);
       // Salva no banco
       _repository.Create(produto);
 

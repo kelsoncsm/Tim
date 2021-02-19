@@ -11,17 +11,11 @@ namespace Tim.Domain.Infra
     public class DBProdutoContextFactory : IDesignTimeDbContextFactory<DBProduto>
     {
 
-        public DBProdutoContextFactory(IConfiguration configuration)
-        {
-            Configuration = configuration;
-
-        }
-        public IConfiguration Configuration { get; }
-
+     
         public DBProduto CreateDbContext(string[] args)
         {
             var optionsBuilder = new DbContextOptionsBuilder<DBProduto>();
-            optionsBuilder.UseSqlServer(Configuration.GetConnectionString("connectionString"));
+            optionsBuilder.UseSqlServer("Data Source=LAPTOP-NLBJUPA4\\SQLEXPRESS; Initial Catalog=db-tim; Integrated Security=True");
             return new DBProduto(optionsBuilder.Options);
         }
     }

@@ -1,15 +1,24 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using Tim.Domain.Handlers;
+using Tim.Domain.Infra;
+using Tim.Domain.Infra.Repositories;
+using Tim.Domain.Repositories;
 
 namespace Tim.Domain.Api
 {
@@ -27,6 +36,21 @@ namespace Tim.Domain.Api
         {
 
             services.AddControllers();
+            services.AddDbContext<DBProduto>(opt => opt.UseSqlServer(Configuration.GetConnectionString("connectionString")));
+
+
+
+            services.AddTransient<IProdutoRepository, ProdutoRepository>();
+            services.AddTransient<ProdutoHandler, ProdutoHandler>();
+
+
+            services.Configure<FormOptions>(o =>
+            {
+                o.ValueLengthLimit = int.MaxValue;
+                o.MultipartBodyLengthLimit = int.MaxValue;
+                o.MemoryBufferThreshold = int.MaxValue;
+            });
+
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1",
@@ -45,11 +69,30 @@ namespace Tim.Domain.Api
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
-                app.UseSwagger();
-                app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "Tim.Domain.Api v1"));
             }
 
+
+
+            app.UseSwagger();
+            app.UseSwaggerUI(c =>
+            {
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "Api Tim Radar V1");
+            });
+
+            app.UseStaticFiles();
+            app.UseStaticFiles(new StaticFileOptions()
+            {
+                FileProvider = new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), @"Temp")),
+                RequestPath = new PathString("/Temp")
+            });
+
+
             app.UseRouting();
+
+            app.UseCors(x => x
+                    .AllowAnyOrigin()
+                    .AllowAnyMethod()
+                    .AllowAnyHeader());
 
             app.UseAuthorization();
 

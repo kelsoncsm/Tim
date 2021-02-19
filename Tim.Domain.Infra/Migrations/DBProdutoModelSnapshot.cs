@@ -41,7 +41,7 @@ namespace Tim.Domain.Infra.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Produto");
+                    b.ToTable("produto");
                 });
 #pragma warning restore 612, 618
         }
