@@ -88,13 +88,6 @@ namespace Tim.Domain.Api
             });
 
             app.UseStaticFiles();
-            app.UseStaticFiles(new StaticFileOptions()
-            {
-                FileProvider = new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), @"Temp")),
-                RequestPath = new PathString("/Temp")
-            });
-
-
             app.UseRouting();
 
             app.UseCors(x => x

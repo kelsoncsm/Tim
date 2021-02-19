@@ -10,20 +10,14 @@ namespace Tim.Domain.Commands
         {
         }
 
-        public CreateLoteCommand(DateTime dataLote, decimal valorTotal, int quantidadeItens, int id = 0)
+        public CreateLoteCommand(DateTime dataLote, int id = 0)
         {
             DataLote = dataLote;
-            QuantidadeItens = quantidadeItens;
-            ValorTotal = valorTotal;
         }
 
 
         public DateTime DataLote { get;  set; }
-        public int QuantidadeItens { get;  set; }
-        public decimal ValorTotal { get;  set; }
-
-
-
+      
         public void Validate()
         {
 

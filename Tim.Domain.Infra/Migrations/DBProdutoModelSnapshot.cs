@@ -29,12 +29,6 @@ namespace Tim.Domain.Infra.Migrations
                     b.Property<DateTime>("DataLote")
                         .HasColumnType("DATETIME");
 
-                    b.Property<byte>("QuantidadeItens")
-                        .HasColumnType("TINYINT");
-
-                    b.Property<decimal>("ValorTotal")
-                        .HasColumnType("DECIMAL(18,2)");
-
                     b.HasKey("Id");
 
                     b.ToTable("lote");

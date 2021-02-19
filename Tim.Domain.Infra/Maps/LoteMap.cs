@@ -13,8 +13,6 @@ namespace Tim.Domain.Infra.Maps
             builder.Property(c => c.Id).ValueGeneratedOnAdd();
 
             builder.Property(c => c.DataLote).HasColumnType("DATETIME").IsRequired();
-            builder.Property(c => c.ValorTotal).HasColumnType("DECIMAL(18,2)").IsRequired();
-            builder.Property(c => c.QuantidadeItens).HasColumnType("TINYINT").IsRequired();
 
         }
     }

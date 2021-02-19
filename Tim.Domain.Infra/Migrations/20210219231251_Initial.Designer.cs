@@ -10,7 +10,7 @@ using Tim.Domain.Infra;
 namespace Tim.Domain.Infra.Migrations
 {
     [DbContext(typeof(DBProduto))]
-    [Migration("20210219201830_Initial")]
+    [Migration("20210219231251_Initial")]
     partial class Initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -30,12 +30,6 @@ namespace Tim.Domain.Infra.Migrations
 
                     b.Property<DateTime>("DataLote")
                         .HasColumnType("DATETIME");
-
-                    b.Property<byte>("QuantidadeItens")
-                        .HasColumnType("TINYINT");
-
-                    b.Property<decimal>("ValorTotal")
-                        .HasColumnType("DECIMAL(18,2)");
 
                     b.HasKey("Id");
 

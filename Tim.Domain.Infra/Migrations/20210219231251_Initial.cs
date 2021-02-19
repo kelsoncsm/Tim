@@ -13,9 +13,7 @@ namespace Tim.Domain.Infra.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    DataLote = table.Column<DateTime>(type: "DATETIME", nullable: false),
-                    QuantidadeItens = table.Column<byte>(type: "TINYINT", nullable: false),
-                    ValorTotal = table.Column<decimal>(type: "DECIMAL(18,2)", nullable: false)
+                    DataLote = table.Column<DateTime>(type: "DATETIME", nullable: false)
                 },
                 constraints: table =>
                 {

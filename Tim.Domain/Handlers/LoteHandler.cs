@@ -23,12 +23,12 @@ namespace Tim.Domain.Handlers
         return new GenericCommandResult(false, "Ocorreu um erro!", command.Notifications);
 
     
-      Lote lote = new Lote(command.DataLote,command.ValorTotal,command.QuantidadeItens);
+      Lote lote = new Lote(command.DataLote);
       // Salva no banco
       _repository.Create(lote);
 
       // Retorna o resultado
-      return new GenericCommandResult(true, "Lote salvo com sucesso", lote);
+      return new GenericCommandResult(true, "Lote salvo com sucesso", lote.Id);
     }
 
 

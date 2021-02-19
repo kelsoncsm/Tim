@@ -26,19 +26,19 @@ namespace Tim.Domain.Infra.Repositories
         }
 
 
-        public IEnumerable<RetornoLoteDto> GetAll()
+        public IEnumerable<RetornoLoteDto> GetAllImports()
         {
 
 
             var query = (from p in _context.Produto
                          join l in _context.Lote
                          on p.IdLote equals l.Id
-                         group new { p, l } by new { l.Id, l.QuantidadeItens, l.ValorTotal, l.DataLote } into g
+                         group new { p, l } by new { l.Id,l.DataLote } into g
                          select new RetornoLoteDto
                          {
                              Id = g.Key.Id,
-                             QuantidadeItens = g.Key.QuantidadeItens,
-                             ValorTotal = g.Key.ValorTotal,
+                             QuantidadeItens = g.Sum(x=>x.p.Quantidade),
+                             ValorTotal = g.Sum(x=>x.p.ValorUnitario),
                              DataLote = g.Key.DataLote,
                              DataEntrega = g.Min(x => x.p.DataEntrega)
                          });
@@ -47,20 +47,34 @@ namespace Tim.Domain.Infra.Repositories
 
         }
 
-        public Produto GetById(int id)
+     
+        public IEnumerable<RetornoProdutoDto> GetImportById(int id)
         {
 
-            Produto retorno = _context
-             .Produto
-             .Where(x => x.Id == id)
-             .FirstOrDefault();
 
-            if (retorno == null)
+            var query = (from p in _context.Produto
+                         join l in _context.Lote
+                        on p.IdLote equals l.Id
+                        where l.Id == id
+                         group new { p } by new { p.Quantidade, p.ValorUnitario, p.Descricao, p.DataEntrega } into g
+                         select new RetornoProdutoDto
+                         {
+                             DataEntrega = g.Min(x => x.p.DataEntrega),
+                             Descricao = g.Key.Descricao,
+                             Quantidade = g.Key.Quantidade,
+                             ValorUnitario = g.Key.ValorUnitario,
+                             ValorTotal = g.Key.ValorUnitario * g.Key.Quantidade
+                         });
+
+            if (query.ToList().Count == 0)
                 throw new Exception("Registro não encontrado");
 
 
-            return retorno;
+
+            return query;
+
         }
+
 
     }
 }

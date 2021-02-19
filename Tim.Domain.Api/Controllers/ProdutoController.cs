@@ -13,6 +13,7 @@ using Tim.Domain.DTOs;
 using Tim.Domain.Entities;
 using Tim.Domain.Handlers;
 using Tim.Domain.Repositories;
+using Tim.Domain.Api.Util;
 
 namespace Tim.Domain.Api.Controllers
 {
@@ -23,14 +24,14 @@ namespace Tim.Domain.Api.Controllers
         private OleDbConnection _olecon;
         private OleDbCommand _oleCmd;
         private string _urlExcel = @"Provider=Microsoft.ACE.OLEDB.12.0;Data Source = { 0 }; Extended Properties = 'Excel 12.0 Xml;HDR=YES;ReadOnly=False';";
+        private ValidaCampo _validaCampo;
+
 
 
         [Route("Upload")]
         [HttpPost]
         public async Task<IActionResult> UploadDoc([FromForm(Name = "files")] IList<IFormFile> files, [FromServices] ProdutoHandler produtohandler, [FromServices] LoteHandler loteHandler)
         {
-
-
 
             if (files.Count <= 0)
                 return new StatusCodeResult(StatusCodes.Status400BadRequest);
@@ -39,10 +40,9 @@ namespace Tim.Domain.Api.Controllers
             string erros = string.Empty;
             List<string> listaerros = new List<string>();
             int numLinhaErro = 0;
-            int qtdItens = 0;
-            decimal valorToral = 0;
-            var filePath = string.Empty;
+            _validaCampo = new ValidaCampo();
 
+            var filePath = string.Empty;
             foreach (var formFile in files)
             {
                 if (formFile.Length > 0)
@@ -83,57 +83,13 @@ namespace Tim.Domain.Api.Controllers
                     command.Quantidade = reader["Quantidade"] != null ? Convert.ToInt32(reader["Quantidade"].ToString()) : null;
                     command.ValorUnitario = reader["Valor Unitário"] != null ? Convert.ToDecimal(reader["Valor Unitário"].ToString()) : null;
 
-                    #region CamposObrigatorios
-                    if (command.DataEntrega == null)
-                    {
-                        erros += string.Format("Linha numero {0} Data Entrega campo obrigatorio.", numLinhaErro);
+                    #region Validações de campo
 
-                    }
-                    else if (command.DataEntrega.Value <= DateTime.Now)
-                    {
-                        erros += string.Format("Linha numero {0} -  O campo data de entrega não pode ser menor ou igual que o dia atual", numLinhaErro);
+                    erros += _validaCampo.ValidaDataMaiorQueHoje(command.DataEntrega, numLinhaErro);
+                    erros += _validaCampo.ValidaCampoVazio(command.Descricao, numLinhaErro);
+                    erros += _validaCampo.ValorMaiorQueZero("Quantidade", command.Quantidade, numLinhaErro);
+                    erros += _validaCampo.ValorMaiorQueZero("Valor Unitário", command.ValorUnitario, numLinhaErro);
 
-                    }
-
-                    if (string.IsNullOrEmpty(command.Descricao))
-                    {
-                        erros += string.Format("Linha numero {0} - Nome do Produto campo obrigatorio.", numLinhaErro);
-                    }
-                    else if (command.Descricao.Length > 50)
-                    {
-                        erros += string.Format("Linha numero {0} - O campo descrição precisa ter o tamanho máximo de 50 caracteres", numLinhaErro);
-
-                    }
-
-                    if (command.Quantidade == null)
-                    {
-                        erros += string.Format("Linha numero {0} - Quantidade campo obrigatorio.", numLinhaErro);
-
-                    }
-                    else if (command.Quantidade <= 0)
-                    {
-                        erros += string.Format("Linha numero {0} - O campo quantidade tem que ser maior do que zero", numLinhaErro);
-
-                    }
-                    else
-                    {
-                        qtdItens += command.Quantidade.Value;
-                    }
-
-                    if (command.ValorUnitario == null)
-                    {
-                        erros += string.Format("Linha numero {0} -  Valor Unitário campo obrigatorio. ", numLinhaErro);
-                    }
-                    else if (command.ValorUnitario <= 0)
-                    {
-                        erros += string.Format("Linha numero {0} -  O campo Valor Unitário deve ser  maior do que zero", numLinhaErro);
-
-                    }
-                    else
-                    {
-                        command.ValorUnitario = Math.Round(command.ValorUnitario.Value, 2);
-                        valorToral += (command.ValorUnitario.Value * command.Quantidade.Value);
-                    }
 
                     #endregion
 
@@ -149,7 +105,6 @@ namespace Tim.Domain.Api.Controllers
                     }
 
                     command = new CreateProdutoCommand();
-
                 }
 
                 reader.Close();
@@ -162,7 +117,7 @@ namespace Tim.Domain.Api.Controllers
                 {
 
 
-                    var retorno = (GenericCommandResult)loteHandler.Handle(new CreateLoteCommand() { DataLote = DateTime.Now, QuantidadeItens = qtdItens, ValorTotal = valorToral });
+                    var retorno = (GenericCommandResult)loteHandler.Handle(new CreateLoteCommand() { DataLote = DateTime.Now });
 
                     foreach (var item in listaInsert)
                     {
@@ -188,25 +143,28 @@ namespace Tim.Domain.Api.Controllers
 
         [Route("{id}")]
         [HttpGet()]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetById([FromRoute] int id, [FromServices] IProdutoRepository repository)
         {
 
             try
             {
+                IEnumerable<RetornoProdutoDto> lista = repository.GetImportById(id);
 
-                Produto retorno = repository.GetById(id);
+                return new JsonResult(new { Lista = lista });
 
-                return new JsonResult(retorno);
+
             }
             catch (Exception ex)
             {
 
-                return new JsonResult(new Retorno() { Status = StatusCodes.Status404NotFound, Mensagem = ex.Message });
+                return new JsonResult(new Retorno() { Status = StatusCodes.Status400BadRequest, Mensagem = ex.Message });
 
+
+                //return new JsonResult(new Retorno() { Status = StatusCodes.Status404NotFound, Mensagem = ex.Message });
 
             }
 
-            //return new JsonResult(await _holderQueryHandler.GetArchiveByHolder(id));
         }
 
         [Route("")]
@@ -214,8 +172,10 @@ namespace Tim.Domain.Api.Controllers
         public IEnumerable<RetornoLoteDto> GetAll([FromServices] IProdutoRepository repository)
         {
 
-            return repository.GetAll();
+            return repository.GetAllImports();
         }
+
+
 
 
     }

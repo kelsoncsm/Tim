@@ -15,6 +15,7 @@ namespace Tim.Domain.Entities
             Descricao = descricao;
             DataEntrega = dataEntrega;
             Quantidade = quantidade;
+            ValorUnitario = valorUnitario;
             IdLote = idLote;
         }
 
