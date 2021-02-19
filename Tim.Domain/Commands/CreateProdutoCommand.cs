@@ -18,10 +18,10 @@ namespace Tim.Domain.Commands
             ValorUnitario = valorUnitario;
     }
 
-    public string Descricao { get; set; }
-    public DateTime DataEntrega { get; set; }
-    public int Quantidade { get; set; }
-    public decimal ValorUnitario { get; set; }
+    public string? Descricao { get; set; }
+    public DateTime? DataEntrega { get; set; }
+    public int? Quantidade { get; set; }
+    public decimal? ValorUnitario { get; set; }
   
 
     public void Validate()

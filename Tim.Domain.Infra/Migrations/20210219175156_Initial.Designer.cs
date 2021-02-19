@@ -10,7 +10,7 @@ using Tim.Domain.Infra;
 namespace Tim.Domain.Infra.Migrations
 {
     [DbContext(typeof(DBProduto))]
-    [Migration("20210219142955_Initial")]
+    [Migration("20210219175156_Initial")]
     partial class Initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -43,7 +43,7 @@ namespace Tim.Domain.Infra.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Produto");
+                    b.ToTable("produto");
                 });
 #pragma warning restore 612, 618
         }
