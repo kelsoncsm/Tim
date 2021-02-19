@@ -8,38 +8,45 @@ using Tim.Domain.Queries;
 
 namespace Tim.Domain.Infra.Repositories
 {
-  public class ProdutoRepository : IProdutoRepository
-  {
-    private readonly DBProduto _context;
-
-    public ProdutoRepository(DBProduto context)
+    public class ProdutoRepository : IProdutoRepository
     {
-      _context = context;
+        private readonly DBProduto _context;
+
+        public ProdutoRepository(DBProduto context)
+        {
+            _context = context;
+        }
+
+        public void Create(Produto produto)
+        {
+            _context.Produto.Add(produto);
+            _context.SaveChanges();
+        }
+
+
+        public IEnumerable<Produto> GetAll()
+        {
+            var query = _context.Produto
+              .AsNoTracking();
+
+
+            return query.OrderBy(x => x.Descricao);
+        }
+
+        public Produto GetById(int id)
+        {
+
+            Produto retorno = _context
+             .Produto
+             .Where(x => x.Id == id)
+             .FirstOrDefault();
+
+            if (retorno == null)
+                throw new Exception("Registro não encontrado");
+
+
+            return retorno;
+        }
+
     }
-
-    public void Create(Produto produto)
-    {
-      _context.Produto.Add(produto);
-      _context.SaveChanges();
-    }
-
-
-    public IEnumerable<Produto> GetAll()
-    {
-      var query = _context.Produto
-        .AsNoTracking();
-
-     
-      return query.OrderBy(x => x.Descricao);
-    }
-
-    public Produto GetById(int id)
-    {
-      return _context
-          .Produto
-          .Where(x => x.Id == id)
-          .FirstOrDefault();
-    }
-
-  }
 }

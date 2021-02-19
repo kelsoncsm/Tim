@@ -11,6 +11,7 @@ using Tim.Domain.Api.Util;
 using Tim.Domain.Commands;
 using Tim.Domain.Entities;
 using Tim.Domain.Handlers;
+using Tim.Domain.Repositories;
 
 namespace Tim.Domain.Api.Controllers
 {
@@ -20,7 +21,7 @@ namespace Tim.Domain.Api.Controllers
     {
         private OleDbConnection _olecon;
         private OleDbCommand _oleCmd;
-        private string  _urlExcel = @"Provider=Microsoft.ACE.OLEDB.12.0;Data Source = { 0 }; Extended Properties = 'Excel 12.0 Xml;HDR=YES;ReadOnly=False';";
+        private string _urlExcel = @"Provider=Microsoft.ACE.OLEDB.12.0;Data Source = { 0 }; Extended Properties = 'Excel 12.0 Xml;HDR=YES;ReadOnly=False';";
 
 
         [Route("Upload")]
@@ -120,7 +121,7 @@ namespace Tim.Domain.Api.Controllers
                     }
                     else if (command.ValorUnitario <= 0)
                     {
-                        erros += string.Format("Linha numero {0} -  O campo data de entrega não pode ser menor ou igual que o dia atual", numLinhaErro);
+                        erros += string.Format("Linha numero {0} -  O campo Valor Unitário deve ser  maior do que zero", numLinhaErro);
 
                     }
                     else
@@ -161,9 +162,7 @@ namespace Tim.Domain.Api.Controllers
                 }
 
 
-
-
-                return new JsonResult(new Retorno() { Status = StatusCodes.Status200OK, Erros = new List<string>(), Mensagem = "Lote salvo com sucesso" });
+                return new JsonResult(new Retorno() { Status = StatusCodes.Status200OK, Mensagem = "Lote salvo com sucesso" });
             }
             catch (Exception ex)
             {
@@ -172,6 +171,39 @@ namespace Tim.Domain.Api.Controllers
 
 
             }
+        }
+
+
+
+        [Route("{id}")]
+        [HttpGet()]
+        public async Task<IActionResult> GetById([FromRoute] int id, [FromServices] IProdutoRepository repository)
+        {
+
+            try
+            {
+
+                Produto retorno = repository.GetById(id);
+
+                return new JsonResult(retorno);
+            }
+            catch (Exception ex)
+            {
+
+                return new JsonResult(new Retorno() { Status = StatusCodes.Status404NotFound, Mensagem = ex.Message });
+
+
+            }
+
+            //return new JsonResult(await _holderQueryHandler.GetArchiveByHolder(id));
+        }
+
+        [Route("")]
+        [HttpGet()]
+        public IEnumerable<Produto> GetAll([FromServices] IProdutoRepository repository)
+        {
+
+            return repository.GetAll();
         }
 
 
