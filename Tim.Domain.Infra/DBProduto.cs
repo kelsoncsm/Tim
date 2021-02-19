@@ -14,6 +14,8 @@ namespace Tim.Domain.Infra
 
         public DbSet<Produto> Produto { get; set; }
 
+        public DbSet<Lote> Lote { get; set; }
+
         public DBProduto(DbContextOptions options) : base(options) { }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

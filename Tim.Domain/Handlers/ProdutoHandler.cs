@@ -17,13 +17,13 @@ namespace Tim.Domain.Handlers
 
     public ICommandResult Handle(CreateProdutoCommand command)
     {
-      // Fail Fast Validation
+     
       command.Validate();
       if (command.Invalid)
         return new GenericCommandResult(false, "Ocorreu um erro!", command.Notifications);
 
-      // Gera o Livro
-      Produto produto = new Produto(command.Descricao, command.DataEntrega.Value,
+    
+      Produto produto = new Produto(command.IdLote,command.Descricao, command.DataEntrega.Value,
                               command.Quantidade.Value, command.ValorUnitario.Value);
       // Salva no banco
       _repository.Create(produto);

@@ -4,13 +4,14 @@ using Microsoft.EntityFrameworkCore;
 using System.Linq;
 using System;
 using Tim.Domain.Repositories;
-using Tim.Domain.Queries;
+
 
 namespace Tim.Domain.Infra.Repositories
 {
     public class ProdutoRepository : IProdutoRepository
     {
         private readonly DBProduto _context;
+
 
         public ProdutoRepository(DBProduto context)
         {
@@ -26,9 +27,9 @@ namespace Tim.Domain.Infra.Repositories
 
         public IEnumerable<Produto> GetAll()
         {
+
             var query = _context.Produto
               .AsNoTracking();
-
 
             return query.OrderBy(x => x.Descricao);
         }
